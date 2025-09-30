@@ -1,3 +1,3 @@
 import {ConnectToRedis,getClient} from './redis'
-
-export {ConnectToRedis,getClient}
+import {connectDb} from './mongoDb'
+export {ConnectToRedis,getClient,connectDb}

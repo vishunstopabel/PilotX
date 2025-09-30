@@ -3,7 +3,7 @@ import { IAuth, JwtPayload } from "../types";
 import bcrypt from "bcrypt"
 import { AuthHelper, RedisService } from "../utils";
 const authHelper=new AuthHelper()
-const redisService=new RedisService()
+
 const authSchema = new Schema<IAuth>(
   {
     name: {
@@ -34,7 +34,9 @@ const authSchema = new Schema<IAuth>(
     },
     isEmailVerified: {
       type: Boolean,
-      default: false,
+      default: function(){
+        return this.provider!="local"
+      },
     },
 
     provider: {
@@ -69,6 +71,7 @@ authSchema.methods.generateAccessToken = function () {
  return authHelper.signUser(payload)
 };
 authSchema.methods.generateRefreshToken = function () {
+  const redisService=new RedisService()
   const payload:JwtPayload= { userId: this._id,
     email: this.email, };
   const token = authHelper.signUser(payload,"7d")

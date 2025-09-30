@@ -1,3 +1,5 @@
+import { Document } from "mongoose";
+
 export interface JwtPayload {
   userId: string;
   email: string;
@@ -9,6 +11,17 @@ export interface IAuth extends Document {
   refreshToken?: string;
   isEmailVerified: boolean;
   provider: "local" | "google" | "github";
+  googleId?: string;
+  githubId?: string;
+  generateRefreshToken: () => Promise<string>;
+  generateAccessToken: () => string;
+}
+export type Provider = "google" | "github";
+
+export interface OAuth {
+  name: string;
+  email: string;
+  avatarUrl: string;
   googleId?: string;
   githubId?: string;
 }

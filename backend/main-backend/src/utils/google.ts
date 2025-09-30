@@ -38,4 +38,14 @@ export class GoogleApi {
     this.oauth2Client.setCredentials(tokens);
     return tokens;
   }
+
+  async getUserInfo(accessToken: string) {
+    const oauth2 = google.oauth2({
+      auth: this.oauth2Client,
+      version: "v2",
+    });
+
+    const { data } = await oauth2.userinfo.get();
+    return data;
+  }
 }

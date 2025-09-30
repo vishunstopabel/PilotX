@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import { httpServer } from "./app";
 import { SocketIo } from "./sockets";
-import { ConnectToRedis } from "./config";
+import { connectDb, ConnectToRedis } from "./config";
 dotenv.config({
 
 });
@@ -10,6 +10,7 @@ const startserver = async () => {
   try {
     await ConnectToRedis();
     await SocketIo(httpServer);
+    await connectDb()
     httpServer.listen(port, () => {
       console.log(`server is listening at the port ${port}`);
     });

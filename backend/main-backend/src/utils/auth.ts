@@ -1,8 +1,9 @@
 import { verify, sign, JwtPayload as JwtPayloadLib } from "jsonwebtoken";
 import { JwtPayload } from "../types";
+import { ENV } from "../config/env";
 
 export class AuthHelper {
- private readonly secret: string = process.env.JWT_SECRET || "changeme";
+ private readonly secret: string = ENV.JWT_SECRET || "changeme";
 
   verifyUser(token: string): JwtPayloadLib {
     try {
