@@ -3,7 +3,7 @@ import { httpServer } from "./app";
 import { SocketIo } from "./sockets";
 import { ConnectToRedis } from "./config";
 dotenv.config({
-  quiet: true,
+
 });
 const startserver = async () => {
   const port = process.env.PORT;
