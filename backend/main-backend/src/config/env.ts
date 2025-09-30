@@ -10,4 +10,6 @@ export const ENV = {
   GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI!,
   JWT_SECRET: process.env.JWT_SECRET,
   MONGODB_URL: process.env.MONGODB_URL,
+  GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
+  GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
 };

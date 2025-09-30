@@ -13,13 +13,21 @@ function Oauth() {
       console.log(error);
     }
   };
+  const handleGithubOAuthInit = async () => {
+    try {
+      window.location.href =
+        "http://localhost:5000/api/v1/auth/github/oauth-init";
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div>
       <div className="flex flex-col gap-2">
         <Button className="cursor-pointer" onClick={handleGoogleOAuthInit}>
           <FcGoogle /> <span>Continue with google</span>
         </Button>
-        <Button className="cursor-pointer">
+        <Button className="cursor-pointer" onClick={handleGithubOAuthInit}>
           <FaGithub /> <span>Continue with Github</span>
         </Button>
       </div>

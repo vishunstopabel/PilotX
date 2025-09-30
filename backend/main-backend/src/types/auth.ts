@@ -25,3 +25,13 @@ export interface OAuth {
   googleId?: string;
   githubId?: string;
 }
+
+
+export interface GitHubUser {
+  login: string;
+  id: number;
+  avatar_url: string;
+  email?: string;
+  name?: string;
+  [key: string]: any;
+}
