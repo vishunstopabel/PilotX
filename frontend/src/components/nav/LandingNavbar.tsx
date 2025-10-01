@@ -2,13 +2,16 @@ import Logo from "./Logo";
 import { Link } from "react-router-dom";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { useRef, useState } from "react";
-
+import { useAppSelector } from "@/store/hooks";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 interface NavItem {
   name: string;
   href: string;
 }
 
 function LandingNavbar() {
+  const { authData, isAuthenticated } = useAppSelector((state) => state.auth);
+  console.log(authData)
   const navElements: NavItem[] = [
     { name: "How it works", href: "#" },
     { name: "Benefits", href: "#" },
@@ -27,8 +30,6 @@ function LandingNavbar() {
     const newChange = latest / 100;
     setScrolled(newChange > 2);
   });
-
-  const isAuthenticated = false;
 
   return (
     <motion.div
@@ -64,12 +65,17 @@ function LandingNavbar() {
       </div>
 
       {isAuthenticated ? (
-        <Link
-          to="/dashboard"
-          className="py-2 px-3 bg-neutral-950 dark:bg-neutral-100 rounded-xl dark:text-black text-neutral-100 hover:-translate-y-1 transition duration-300"
-        >
-          Get Started
-        </Link>
+        <div className="flex flex-row-reverse gap-3 items-center cursor-pointer">
+          <Link
+            to="/dashboard"
+            className="py-2 px-3 bg-neutral-950 dark:bg-neutral-100 rounded-xl dark:text-black text-neutral-100 hover:-translate-y-1 transition duration-300"
+          >
+            Get Started
+          </Link>
+          <div>
+            <img src={authData?.avatarUrl} alt=""  className="rounded-full size-10 border-1  border-white"/>
+          </div>
+        </div>
       ) : (
         <div className="flex gap-2 text-sm">
           <Link

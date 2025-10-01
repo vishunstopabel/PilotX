@@ -6,7 +6,6 @@ const authHelper=new AuthHelper()
 export const isAuthenticated = (req:Request, res:Response, next:NextFunction) => {
   try {
     const authToken = req.cookies?.accessToken;
-
     if (!authToken) {
       throw new ApiError(401, "Not authenticated. Token missing.");
     }
@@ -17,7 +16,6 @@ export const isAuthenticated = (req:Request, res:Response, next:NextFunction) =>
     req.user = decoded;
     next();
   } catch (error) {
-    console.error("Auth middleware error:", error);
     throw new ApiError(401, "Authentication failed.");
   }
 };

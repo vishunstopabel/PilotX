@@ -13,6 +13,7 @@ export interface IAuth extends Document {
   provider: "local" | "google" | "github";
   googleId?: string;
   githubId?: string;
+  avatarUrl?: string;
   generateRefreshToken: () => Promise<string>;
   generateAccessToken: () => string;
 }
@@ -26,7 +27,6 @@ export interface OAuth {
   githubId?: string;
 }
 
-
 export interface GitHubUser {
   login: string;
   id: number;
@@ -34,4 +34,11 @@ export interface GitHubUser {
   email?: string;
   name?: string;
   [key: string]: any;
+}
+
+export interface UserDetails {
+  _id: string;
+  name: string;
+  email: string;
+  avatarUrl?: string;
 }

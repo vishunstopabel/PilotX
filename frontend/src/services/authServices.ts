@@ -59,7 +59,7 @@ export const AuthServices = {
       const response = await axiosInstance.get("/auth/me", {
         withCredentials: true,
       });
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error("Error in AuthServices.getCurrentUser:", error);
       throw error;

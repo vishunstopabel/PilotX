@@ -2,7 +2,6 @@ import { Schema ,model} from "mongoose";
 import { IAuth, JwtPayload } from "../types";
 import bcrypt from "bcrypt"
 import { AuthHelper, RedisService } from "../utils";
-const authHelper=new AuthHelper()
 
 const authSchema = new Schema<IAuth>(
   {
@@ -54,6 +53,11 @@ const authSchema = new Schema<IAuth>(
       index: true,
       sparse: true,
     },
+    avatarUrl:{
+      type:String,
+      index:true,
+      sparse:true
+    }
   },
   {
     timestamps: true,
@@ -64,6 +68,8 @@ authSchema.methods.isPasswordCorrect = async function (password:string) {
 };
 
 authSchema.methods.generateAccessToken = function () {
+  const authHelper=new AuthHelper()
+
   const payload:JwtPayload= {
     userId: this._id,
     email: this.email,
@@ -72,6 +78,8 @@ authSchema.methods.generateAccessToken = function () {
 };
 authSchema.methods.generateRefreshToken = function () {
   const redisService=new RedisService()
+  const authHelper=new AuthHelper()
+
   const payload:JwtPayload= { userId: this._id,
     email: this.email, };
   const token = authHelper.signUser(payload,"7d")

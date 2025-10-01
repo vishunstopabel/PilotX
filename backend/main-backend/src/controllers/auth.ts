@@ -1,7 +1,13 @@
 import { Request, Response } from "express";
-import { ApiError, ApiResponse, asyncHandler, AuthHelper } from "../utils";
+import {
+  ApiError,
+  ApiResponse,
+  asyncHandler,
+  AuthHelper,
+  RedisService,
+} from "../utils";
 import { GoogleApi } from "../utils/google";
-import { IAuth, OAuth } from "../types";
+import { IAuth, OAuth, UserDetails } from "../types";
 import { createAccountViaOauth, getUserViaEmail } from "../services/db";
 import { ENV } from "../config";
 import { getGitHubUser } from "../utils/Github";
@@ -41,6 +47,7 @@ export const GoogleAuthCallback = asyncHandler(
       avatarUrl: userInfo.picture!,
       googleId: userInfo.id!,
     };
+    console.log(refinedUser)
 
     let user;
     const existingUser = await getUserViaEmail(userInfo.email!);
@@ -52,7 +59,7 @@ export const GoogleAuthCallback = asyncHandler(
     const accessToken = user.generateAccessToken();
     const refreshToken = await user.generateRefreshToken();
     await user.save();
-    res.cookie("token", accessToken, {
+    res.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: false,
       sameSite: "lax",
@@ -107,7 +114,7 @@ export const GitHubAuthCallback = asyncHandler(
     const accessToken = user.generateAccessToken();
     const refreshToken = await user.generateRefreshToken();
     await user.save();
-    res.cookie("token", accessToken, {
+    res.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: false,
       sameSite: "lax",
@@ -124,5 +131,20 @@ export const GitHubAuthCallback = asyncHandler(
     });
 
     res.redirect("http://localhost:5173/complete-profile");
+  }
+);
+
+export const getCurrentUser = asyncHandler(
+  async (req: Request, res: Response) => {
+    const redisService = new RedisService();
+    const { userId } = req.user;
+    const details: UserDetails | null = await redisService.getUserDetails(
+      userId
+    );
+
+    if (!details) {
+      throw new ApiError(404, "User not found");
+    }
+    return  res.json(new ApiResponse(200, details));
   }
 );

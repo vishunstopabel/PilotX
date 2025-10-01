@@ -3,7 +3,7 @@ import { JwtPayload } from "../types";
 import { ENV } from "../config/env";
 
 export class AuthHelper {
- private readonly secret: string = ENV.JWT_SECRET || "changeme";
+  private readonly secret: string = ENV.JWT_SECRET || "changeme";
 
   verifyUser(token: string): JwtPayloadLib {
     try {

@@ -1,5 +1,5 @@
 import { AuthModel } from "../../models";
-import { OAuth, Provider } from "../../types";
+import { OAuth, Provider, UserDetails } from "../../types";
 
 export const createAccountViaOauth = async (
   provider: Provider,
@@ -19,4 +19,9 @@ export const createAccountViaOauth = async (
             email:email
         })
 
+};
+
+
+export const getUserById = async (userId: string): Promise<UserDetails | null> => {
+  return AuthModel.findById(userId).select("name email avatarUrl _id");
 };
