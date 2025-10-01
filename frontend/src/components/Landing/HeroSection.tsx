@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { FaLongArrowAltRight } from "react-icons/fa";
-import heroImg from "../../assets/s3Bucket.png"; // Update with GoPilot hero image
+import heroImg from "../../assets/test.png"; // Update with GoPilot hero image
 import { motion, stagger, useAnimate } from "framer-motion";
 import { BackgroundRippleEffect } from "../ui/background-ripple-effect";
 

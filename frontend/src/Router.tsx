@@ -13,12 +13,14 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <>
       <Route path="/" element={<App />}>
-        {/* public */}
         <Route path="/" element={<Landingpage />} />
         <Route element={<AuthenticationLayout />}>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<SignIn />} />
         </Route>
+            <Route path="/" >
+
+            </Route>
       </Route>
     </>
   )
