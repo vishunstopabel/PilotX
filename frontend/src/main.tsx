@@ -11,13 +11,17 @@ import "./index.css";
 import router from "./Router";
 import { Provider } from "react-redux";
 import { store } from "./store/store";
+import { ThemeProvider } from "./components/Other/theme/theme-provider";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
 
-   
+   <ThemeProvider defaultTheme="system" storageKey="theam">
+
+ 
     <RouterProvider router={router} />
+      </ThemeProvider>
      </Provider>
   </StrictMode>
 );
