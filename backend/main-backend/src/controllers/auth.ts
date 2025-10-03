@@ -75,7 +75,7 @@ export const GoogleAuthCallback = asyncHandler(
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.redirect("http://localhost:5173/complete-profile");
+    res.redirect("http://localhost:5173");
   }
 );
 
@@ -130,7 +130,7 @@ export const GitHubAuthCallback = asyncHandler(
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.redirect("http://localhost:5173/complete-profile");
+    res.redirect("http://localhost:5173");
   }
 );
 
