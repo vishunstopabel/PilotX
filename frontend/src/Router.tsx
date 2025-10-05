@@ -8,6 +8,7 @@ import Landingpage from "./pages/public/Landingpage";
 import Login from "./pages/public/Authentication/Login";
 import SignIn from "./pages/public/Authentication/SignIn";
 import AuthenticationLayout from "./pages/public/Authentication/AuthenticationLayout";
+import AutomateLayout from "./pages/private/automate/AutomateLayout";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -18,8 +19,8 @@ const router = createBrowserRouter(
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<SignIn />} />
         </Route>
-            <Route path="/" >
-
+            <Route path="/automate"  element={   <AutomateLayout/>}>
+                   
             </Route>
       </Route>
     </>
