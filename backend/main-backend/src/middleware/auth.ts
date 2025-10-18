@@ -15,6 +15,7 @@ export const isAuthenticated = (req:Request, res:Response, next:NextFunction) =>
     }
     req.user = decoded;
     next();
+    
   } catch (error) {
     throw new ApiError(401, "Authentication failed.");
   }
