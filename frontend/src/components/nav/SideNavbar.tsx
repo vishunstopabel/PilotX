@@ -1,200 +1,155 @@
-import { useState } from "react";
-import {
-  FiSun,
-  FiHome,
-  FiBarChart2,
-  FiFileText,
-  FiSend,
-  FiUsers,
-  FiSettings,
-  FiGitPullRequest,
-  FiDisc,
-  FiArrowLeft,
-  FiChevronLeft,
-  FiGrid,
-  FiLayout,
-  FiPieChart,
-  FiCheckSquare,
-  FiZap,
-  FiTerminal,
-  FiTag,
-  FiWifi,
-  FiCloud,
-} from "react-icons/fi";
+import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import Logo from "./Logo";
+import { useAppSelector } from "@/store/hooks";
 
-// ---- Types ----
-type NavLink = {
-  id: string;
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
-  badge?: number;
+interface CollapsedProps {
+  collapsed: boolean;
+}
+
+const SideCollapse = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="size-5"
+    >
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z" />
+      <path d="M9 4v16" />
+      <path d="M15 10l-2 2l2 2" />
+    </svg>
+  );
 };
 
-type NavSection = {
-  title?: string;
-  links: NavLink[];
+const SideExpand = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="size-5"
+    >
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z" />
+      <path d="M9 4v16" />
+      <path d="M14 10l2 2l-2 2" />
+    </svg>
+  );
 };
 
-// ---- Data for the expanded panel ----
-const panelSections: NavSection[] = [
-  {
-    title: "WEBSITE 2.0",
-    links: [
-      { id: "overview", label: "Overview", icon: FiGrid },
-      { id: "dashboards", label: "Dashboards", icon: FiLayout, badge: 2 },
-      { id: "all-charts", label: "All charts", icon: FiPieChart, badge: 4 },
-      { id: "my-tasks", label: "My tasks", icon: FiCheckSquare, badge: 12 },
-      { id: "insights", label: "Insights", icon: FiZap },
-    ],
-  },
-  {
-    title: "Data Management",
-    links: [
-      { id: "event-log", label: "Event log", icon: FiTerminal },
-      { id: "labels-analytics", label: "Labels & analytics", icon: FiTag },
-      { id: "live-data-feed", label: "Live data feed", icon: FiWifi },
-    ],
-  },
-];
-
-// ---- Data for the primary icon bar ----
-const primaryNavIcons = [
-  { id: "home", icon: FiHome },
-  { id: "barchart", icon: FiBarChart2 },
-  { id: "file", icon: FiFileText },
-  { id: "send", icon: FiSend },
-  { id: "users", icon: FiUsers },
-  { id: "settings", icon: FiSettings },
-  { id: "git", icon: FiGitPullRequest },
-];
-
-// ---- Component ----
-function DashboardSidebar() {
-  const [isPanelOpen, setIsPanelOpen] = useState(true);
-  const [activeItem, setActiveItem] = useState("overview");
-  const profileImage = "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg";
+const UserButtonPlaceholder: React.FC<CollapsedProps> = ({ collapsed }) => {
+  const user = useAppSelector((state) => state.auth.authData);
 
   return (
-    <div className="flex h-screen bg-neutral-950 font-sans">
-      {/* Primary Icon Bar */}
-      <aside className="flex h-full flex-col items-center justify-between border-r border-neutral-800 p-4">
-        {/* Top Icons */}
-        <div className="flex flex-col items-center gap-4">
-          <button className="rounded-lg bg-orange-400 p-2 text-white">
-            <FiSun size={24} />
-          </button>
-          {primaryNavIcons.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setIsPanelOpen(true)}
-              className="rounded-lg p-2 text-neutral-400 transition-colors hover:bg-neutral-800 hover:text-white"
-            >
-              <item.icon size={22} />
-            </button>
-          ))}
-        </div>
-
-        {/* Bottom Icons */}
-        <div className="flex flex-col items-center gap-4">
-          <div className="relative">
-            <div className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-red-500" />
-            <button className="rounded-lg p-2 text-neutral-400 transition-colors hover:bg-neutral-800 hover:text-white">
-              <FiDisc size={22} />
-            </button>
-          </div>
+    <div
+      className={cn(
+        "flex items-center p-3 border-t transition-all duration-300 ease-in-out hover:bg-accent/50 cursor-pointer group",
+        collapsed ? "justify-center" : "justify-start"
+      )}
+    >
+      <div className="flex items-center gap-3 w-full overflow-hidden">
+       
+        <div
+          className={cn(
+            "flex-shrink-0 size-10 rounded-full bg-muted overflow-hidden ring-2 ring-transparent transition-all duration-300 group-hover:ring-primary/20",
+            collapsed && "mx-auto"
+          )}
+        >
           <img
-            src={profileImage}
-            alt="Profile"
-            className="size-10 rounded-full border-2 border-neutral-700"
+            src={user?.avatarUrl}
+            alt={user?.name}
+            className="size-10 rounded-full object-cover transition-transform duration-300 group-hover:scale-110"
           />
         </div>
-      </aside>
 
-      {/* Expanded Content Panel */}
-      <div
-        className={`h-full bg-neutral-900 text-neutral-200 transition-all duration-300 ease-in-out ${
-          isPanelOpen ? "w-72" : "w-0"
-        }`}
-      >
-        <div className="flex h-full flex-col overflow-y-auto p-6">
-          {/* Panel Header */}
-          <div className="flex min-w-max items-center justify-between pb-8">
-            <button className="flex items-center gap-2 text-sm text-neutral-400 transition-colors hover:text-neutral-100">
-              <FiArrowLeft />
-              <span>All projects</span>
-            </button>
-            <button
-              onClick={() => setIsPanelOpen(false)}
-              className="rounded-full p-1 text-neutral-400 transition-colors hover:bg-neutral-800 hover:text-neutral-100"
-            >
-              <FiChevronLeft size={20} />
-            </button>
-          </div>
 
-          {/* Navigation Sections */}
-          <div className="flex-1">
-            {panelSections.map((section) => (
-              <div key={section.title || "section"} className="mb-6">
-                {section.title === "WEBSITE 2.0" ? (
-                  <h2 className="mb-4 min-w-max text-lg font-semibold">
-                    {section.title}
-                  </h2>
-                ) : (
-                  <h3 className="mb-2 min-w-max text-xs font-semibold uppercase tracking-wider text-neutral-500">
-                    {section.title}
-                  </h3>
-                )}
-                <ul className="flex flex-col gap-1">
-                  {section.links.map((link) => (
-                    <li key={link.id}>
-                      <button
-                        onClick={() => setActiveItem(link.id)}
-                        className={`flex min-w-max w-full items-center justify-between rounded-md p-2 text-sm font-medium transition-colors ${
-                          activeItem === link.id
-                            ? "bg-neutral-800 text-white"
-                            : "text-neutral-400 hover:bg-neutral-800 hover:text-white"
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <link.icon className="size-4" />
-                          <span>{link.label}</span>
-                        </div>
-                        {link.badge && (
-                          <span className="rounded-full bg-neutral-700 px-2 py-0.5 text-xs font-bold text-neutral-300">
-                            {link.badge}
-                          </span>
-                        )}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-
-          {/* Storage Section */}
-          <div className="min-w-max border-t border-neutral-800 pt-6">
-            <div className="mb-2 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <FiCloud className="text-neutral-400" />
-                <span className="text-sm font-medium">Storage</span>
-              </div>
-              <button className="rounded-md bg-neutral-800 px-2 py-1 text-xs font-semibold text-neutral-200 transition-colors hover:bg-neutral-700">
-                Upgrade
-              </button>
-            </div>
-            <div className="mb-2 h-1.5 w-full rounded-full bg-neutral-700">
-              <div
-                className="h-1.5 rounded-full bg-white"
-                style={{ width: "91%" }}
-              />
-            </div>
-            <p className="text-xs text-neutral-400">18.2 GB of 20 GB used</p>
-          </div>
+        <div
+          className={cn(
+            "flex flex-col min-w-0 transition-all duration-300 ease-in-out",
+            collapsed
+              ? "w-0 opacity-0 translate-x-4"
+              : "w-full opacity-100 translate-x-0"
+          )}
+        >
+          <p className="text-sm font-medium text-foreground truncate transition-colors duration-200">
+            {user?.name}
+          </p>
+          <p className="text-xs text-muted-foreground truncate transition-colors duration-200">
+            {user?.email.toString()}
+          </p>
         </div>
       </div>
     </div>
   );
-}
+};
 
-export default DashboardSidebar;
+export default function Sidebar() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [activeItem, setActiveItem] = useState<string>(location.pathname);
+  const [collapsed, setCollapsed] = useState<boolean>(false);
+
+  useEffect(() => {
+    setActiveItem(location.pathname);
+  }, [location.pathname]);
+
+  const handleNavigate = (href: string) => {
+    navigate(href);
+    setActiveItem(href);
+  };
+
+  return (
+    <aside
+      className={cn(
+        "flex flex-col border-r bg-background text-foreground transition-all duration-300 ease-in-out h-screen shadow-sm",
+        collapsed ? "w-16" : "w-64"
+      )}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-4 border-b">
+        <div
+          className={cn(
+            "transition-all duration-300 overflow-hidden",
+            collapsed ? "w-0 opacity-0" : "w-auto opacity-100"
+          )}
+        >
+          <Logo size={18} showText={true} variant="compact" />
+        </div>
+
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className={cn(
+            "p-2 rounded-lg transition-all duration-200 hover:bg-accent/80 active:scale-95 cursor-pointer",
+            collapsed && "mx-auto"
+          )}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          {collapsed ? <SideExpand /> : <SideCollapse />}
+        </button>
+      </div>
+
+      {/* Content Area */}
+      <div className="flex-1 overflow-y-auto p-2"></div>
+
+      {/* User Section */}
+      <div>
+        <UserButtonPlaceholder collapsed={collapsed} />
+      </div>
+    </aside>
+  );
+}

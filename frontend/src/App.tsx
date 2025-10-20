@@ -1,12 +1,28 @@
-import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
-import { AuthServices } from "./services";
+import { useTheme } from "./components/Other/theme/use-theme";
+import type { Theme } from "./components/Other/theme/theme-provider";
+import { useEffect, useState } from "react";
 import { useAppDispatch } from "./store/hooks";
+import { AuthServices } from "./services";
 import { addUser } from "./store/slices/authSlice";
+import { LoaderOne } from "./components/ui/loader";
 
 function App() {
+  const { theme, setTheme } = useTheme();
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(true);
+  const switchTheme = (ev: KeyboardEvent) => {
+    if (ev.ctrlKey && (ev.key === "m" || ev.key === "M")) {
+      const themes: Theme[] = ["dark", "light", "system"];
+      const currentIndex = themes.indexOf(theme as Theme);
+      const nextIndex = (currentIndex + 1) % themes.length;
+      setTheme(themes[nextIndex]);
+    }
+  };
+  useEffect(() => {
+    window.addEventListener("keydown", switchTheme);
+    return () => window.removeEventListener("keydown", switchTheme);
+  }, [theme]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -27,7 +43,7 @@ function App() {
   if (loading) {
     return (
       <div className="flex h-screen w-screen items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500"></div>
+        <LoaderOne />;
       </div>
     );
   }

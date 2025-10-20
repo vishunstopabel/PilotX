@@ -3,8 +3,6 @@ import { Link } from "react-router-dom";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { useRef, useState } from "react";
 import { useAppSelector } from "@/store/hooks";
-// import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import ThemeToggle from "../Other/theme/ThemeToggle";
 interface NavItem {
   name: string;
   href: string;
@@ -97,9 +95,6 @@ function LandingNavbar() {
           </Link>
         </div>
       )}
-      <div>
-        <ThemeToggle />
-      </div>
     </motion.div>
   );
 }

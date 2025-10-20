@@ -1,4 +1,4 @@
-import { FcGoogle } from "react-icons/fc";
+import logo from "../../assets/logo.png";
 
 interface LogoProps {
   width?: number;
@@ -6,6 +6,7 @@ interface LogoProps {
   size?: number;
   className?: string;
   showText?: boolean;
+  variant?: "default" | "compact" | "icon-only";
 }
 
 function Logo({
@@ -14,23 +15,49 @@ function Logo({
   size = 30,
   className = "",
   showText = true,
+  variant = "default",
 }: LogoProps) {
+  const isIconOnly = variant === "icon-only" || !showText;
+  const isCompact = variant === "compact";
+
   return (
     <div
-      className={`flex items-center text-neutral-900 dark:text-neutral-100 ${className}`}
+      className={`flex items-center gap-1 ${className}`}
       style={{ minWidth: `${width}rem`, minHeight: `${height}rem` }}
+      role="img"
+      aria-label="Pilot X"
     >
-      {/* Google "G" Logo */}
-      <FcGoogle
-        size={size} // dynamically use the size prop
-        className="flex-shrink-0"
-        aria-label="GoPilot Logo"
-      />
+      {/* Logo Image */}
+      <div 
+        className="flex-shrink-0 transition-transform duration-200 hover:scale-105"
+        style={{ width: `${size}px`, height: `${size}px` }}
+      >
+        <img 
+          src={logo} 
+          alt="Pilot X Logo" 
+          className="w-full h-full object-contain"
+          draggable={false}
+        />
+      </div>
 
-      {showText && (
-        <p className="ml-2 text-lg font-semibold mt-1 select-none">
-          GoPilot
-        </p>
+      {/* Logo Text */}
+      {!isIconOnly && (
+        <div className="flex items-baseline gap-0.5">
+          <span 
+            className={`font-bold tracking-tight text-neutral-900 dark:text-neutral-100 select-none transition-colors ${
+              isCompact ? "text-xl" : "text-2xl"
+            }`}
+          >
+            Pilot
+          </span>
+          <span 
+            className={`font-bold tracking-tight text-orange-500 dark:text-orange-400 select-none transition-all duration-300 ${
+              isCompact ? "text-xl" : "text-2xl"
+            }`}
+          >
+            X
+          </span>
+        </div>
       )}
     </div>
   );
