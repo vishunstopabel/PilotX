@@ -1,11 +1,16 @@
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ElementType } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Logo from "./Logo";
 import { useAppSelector } from "@/store/hooks";
 
 interface CollapsedProps {
   collapsed: boolean;
+}
+interface NavItemData {
+  name: string;
+  icon: ElementType;
+  href: string;
 }
 
 const SideCollapse = () => {
@@ -52,6 +57,29 @@ const SideExpand = () => {
   );
 };
 
+const AddIcon = () => {
+  return (
+    <>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path d="M12 7m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+        <path d="M17 16m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+        <path d="M7 16m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+      </svg>
+    </>
+  );
+};
+
 const UserButtonPlaceholder: React.FC<CollapsedProps> = ({ collapsed }) => {
   const user = useAppSelector((state) => state.auth.authData);
 
@@ -63,10 +91,9 @@ const UserButtonPlaceholder: React.FC<CollapsedProps> = ({ collapsed }) => {
       )}
     >
       <div className="flex items-center gap-3 w-full overflow-hidden">
-       
         <div
           className={cn(
-            "flex-shrink-0 size-10 rounded-full bg-muted overflow-hidden ring-2 ring-transparent transition-all duration-300 group-hover:ring-primary/20",
+            "flex-shrink-0 size-10 rounded-full bg-muted overflow-hidden ring-2 ring-transparent transition-all duration-300 group-hover:ring-orange-500/20",
             collapsed && "mx-auto"
           )}
         >
@@ -76,7 +103,6 @@ const UserButtonPlaceholder: React.FC<CollapsedProps> = ({ collapsed }) => {
             className="size-10 rounded-full object-cover transition-transform duration-300 group-hover:scale-110"
           />
         </div>
-
 
         <div
           className={cn(
@@ -97,6 +123,57 @@ const UserButtonPlaceholder: React.FC<CollapsedProps> = ({ collapsed }) => {
     </div>
   );
 };
+
+const navItems: NavItemData[] = [
+  {
+    name: "New Task",
+    icon: AddIcon,
+    href: "/new",
+  },
+  {
+    name: "Chats",
+    icon: () => (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path d="M8 9h8" />
+        <path d="M8 13h6" />
+        <path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12z" />
+      </svg>
+    ),
+    href: "/chats",
+  },
+  {
+    name: "Connect",
+    icon: () => (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+        <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+      </svg>
+    ),
+    href: "/connect",
+  },
+];
 
 export default function Sidebar() {
   const navigate = useNavigate();
@@ -121,7 +198,7 @@ export default function Sidebar() {
       )}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-4 border-b">
+      <div className="flex items-center justify-between px-4 py-2">
         <div
           className={cn(
             "transition-all duration-300 overflow-hidden",
@@ -144,9 +221,45 @@ export default function Sidebar() {
       </div>
 
       {/* Content Area */}
-      <div className="flex-1 overflow-y-auto p-2"></div>
+      <div className="flex-1 p-2 scrollbar-thin">
+        <nav className="space-y-1">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeItem === item.href;
 
-      {/* User Section */}
+            return (
+              <button
+                key={item.href}
+                onClick={() => handleNavigate(item.href)}
+                className={cn(
+                  "flex items-center w-full rounded-lg transition-all duration-200 group active:scale-95",
+                  collapsed ? "justify-center p-3" : "justify-start p-3 gap-3",
+                  isActive
+                    ? "bg-orange-500/80 text-white shadow-lg"
+                    : "hover:bg-gray-300/60 text-foreground"
+                )}
+                aria-label={item.name}
+              >
+                <div className="flex-shrink-0 size-5">
+                  <Icon />
+                </div>
+
+                <span
+                  className={cn(
+                    "text-sm font-medium transition-all duration-300 ease-in-out whitespace-nowrap",
+                    collapsed
+                      ? "w-0 opacity-0 translate-x-4"
+                      : "w-auto opacity-100 translate-x-0"
+                  )}
+                >
+                  {item.name}
+                </span>
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+
       <div>
         <UserButtonPlaceholder collapsed={collapsed} />
       </div>
