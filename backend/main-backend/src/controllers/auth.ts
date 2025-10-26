@@ -6,13 +6,13 @@ import {
   AuthHelper,
   RedisService,
 } from "../utils";
-import { GoogleApi } from "../utils/google";
+import { GoogleConnectApi } from "../utils/google/Connect";
 import { IAuth, OAuth, UserDetails } from "../types";
 import { createAccountViaOauth, getUserViaEmail } from "../services/db";
 import { ENV } from "../config";
 import { getGitHubUser } from "../utils/Github";
 export const GoogleAuthInit = asyncHandler((req: Request, res: Response) => {
-  const googleApi = new GoogleApi();
+  const googleApi = new GoogleConnectApi();
   const authUrl = googleApi.getAuthUrl();
 
   if (!authUrl) {
@@ -27,7 +27,7 @@ export const GoogleAuthInit = asyncHandler((req: Request, res: Response) => {
 });
 export const GoogleAuthCallback = asyncHandler(
   async (req: Request, res: Response) => {
-    const googleApi = new GoogleApi();
+    const googleApi = new GoogleConnectApi();
     const { code } = req.query;
 
     if (!code || typeof code !== "string")
@@ -47,7 +47,7 @@ export const GoogleAuthCallback = asyncHandler(
       avatarUrl: userInfo.picture!,
       googleId: userInfo.id!,
     };
-    console.log(refinedUser)
+    console.log(refinedUser);
 
     let user;
     const existingUser = await getUserViaEmail(userInfo.email!);
@@ -145,6 +145,6 @@ export const getCurrentUser = asyncHandler(
     if (!details) {
       throw new ApiError(404, "User not found");
     }
-    return  res.json(new ApiResponse(200, details));
+    return res.json(new ApiResponse(200, details));
   }
 );

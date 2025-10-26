@@ -1,7 +1,7 @@
 import { Schema ,model} from "mongoose";
-import { IAuth, JwtPayload } from "../types";
+import { IAuth, JwtPayload } from "../../types";
 import bcrypt from "bcrypt"
-import { AuthHelper, RedisService } from "../utils";
+import { AuthHelper, RedisService } from "../../utils";
 
 const authSchema = new Schema<IAuth>(
   {

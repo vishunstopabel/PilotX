@@ -1,7 +1,7 @@
 import { google } from "googleapis";
-import { ENV } from "../config/env";
+import { ENV } from "../../config/env";
 
-export class GoogleApi {
+export class GoogleConnectApi {
   private oauth2Client;
 
   constructor() {
