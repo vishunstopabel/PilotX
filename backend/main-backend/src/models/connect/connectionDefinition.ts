@@ -8,7 +8,12 @@ const ConnectionDefinitionSchema = new Schema<IConnectionDef>(
     displayName: { type: String, required: true },
     description: { type: String },
 
-    scopes: [{ type: String }],
+    scopes: [
+      {
+        name: { type: String, required: true },
+        description: { type: String, required: true },
+      },
+    ],
     iconUrl: {
       type: String,
       required: true,
@@ -18,10 +23,10 @@ const ConnectionDefinitionSchema = new Schema<IConnectionDef>(
       enum: ["oauth2", "apiKey"],
       default: "oauth2",
     },
-    isEnabled:{
-      type:Boolean,
-      default:true
-    }
+    isEnabled: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true }
 );

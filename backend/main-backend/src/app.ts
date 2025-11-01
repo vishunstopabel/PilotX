@@ -4,6 +4,9 @@ import { createServer } from "http";
 import cors from "cors";
 import { corsConfig } from "./utils";
 import { authRouter } from "./routes";
+import { connectionRouter } from "./routes/connetion";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const app: Application = express();
 const httpServer = createServer(app);
@@ -16,9 +19,12 @@ app.use(
   })
 );
 app.use(cookieParser());
+console.log(__dirname);
+app.use("/public", express.static(path.join(__dirname, "public")));
 app.get("/api/v1/health", (req, res) => {
   res.send("all cool and running well");
 });
-app.use("/api/v1/auth",authRouter)
+app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/connection", connectionRouter);
 
 export { httpServer };
