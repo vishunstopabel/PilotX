@@ -1,9 +1,15 @@
 import { Request, Response } from "express";
-import { asyncHandler } from "../utils";
+import { ApiResponse, asyncHandler } from "../utils";
 import { ServiceConnection } from "../models/connect/serviceConnection";
 import { ConnectionDefinition } from "../models/connect/connectionDefinition";
 import { IConnectionDef, IServiceConnection } from "../types";
-
+import { GoogleConnectApi } from "../utils/google/Connect";
+import mongoose from "mongoose";
+interface IScope {
+  name: string;
+  description: string;
+  _id: string;
+}
 const connectToService = asyncHandler(
   async (req: Request, res: Response) => {}
 );
@@ -91,5 +97,57 @@ export const addConnectionDef = asyncHandler(
       message: `${inserted.length} connection definition(s) added successfully.`,
       data: inserted,
     });
+  }
+);
+
+export const GoogleServiceInt = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { scopes, service } = req.body;
+    const scopeIds = scopes.map((s: string) => new mongoose.Types.ObjectId(s));
+    const connectionDef = await ConnectionDefinition.aggregate([
+      { $match: { service } },
+      {
+        $project: {
+          provider: 1,
+          service: 1,
+          displayName: 1,
+          scopes: {
+            $filter: {
+              input: "$scopes",
+              as: "scope",
+              cond: { $in: ["$$scope._id", scopeIds] },
+            },
+          },
+        },
+      },
+    ]);
+
+    //TODO : check whether the same scops present in the userConnections;
+
+    if (!connectionDef.length) {
+      return res
+        .status(404)
+        .json(new ApiResponse(404, null, "No connection definition found"));
+    }
+    const connection = connectionDef[0];
+    const scopeList = connection.scopes.map((s: IScope) => s.name);
+    if (!scopeList.length) {
+      return res
+        .status(400)
+        .json(new ApiResponse(400, null, "No valid scopes found in database"));
+    }
+    const googleApi = new GoogleConnectApi();
+    const serviceUri = googleApi.getServiceConnectUrl(scopeList, service);
+    if (!serviceUri) {
+      return res
+        .status(500)
+        .json(
+          new ApiResponse(500, null, "Failed to generate Google OAuth URL")
+        );
+    }
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, serviceUri, "Redirect to Google OAuth"));
   }
 );

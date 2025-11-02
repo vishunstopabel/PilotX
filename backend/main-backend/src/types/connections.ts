@@ -1,8 +1,9 @@
 import { Document, Types } from "mongoose";
 
-export interface IScope {
-  name: string; // scope URL
-  description: string; // human-readable meaning
+export interface IScope  {
+  name: string;
+  description: string; 
+
 }
 
 export interface IConnectionDef extends Document {

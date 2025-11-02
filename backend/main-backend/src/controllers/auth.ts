@@ -11,6 +11,8 @@ import { IAuth, OAuth, UserDetails } from "../types";
 import { createAccountViaOauth, getUserViaEmail } from "../services/db";
 import { ENV } from "../config";
 import { getGitHubUser } from "../utils/Github";
+import { stat } from "fs";
+import { GoogleApis } from "googleapis";
 export const GoogleAuthInit = asyncHandler((req: Request, res: Response) => {
   const googleApi = new GoogleConnectApi();
   const authUrl = googleApi.getAuthUrl();
@@ -88,49 +90,54 @@ export const GitHubAuthInit = asyncHandler(
 
 export const GitHubAuthCallback = asyncHandler(
   async (req: Request, res: Response) => {
-    const { code } = req.query;
-
+    const { code, state } = req.query;
     if (!code || typeof code !== "string")
       throw new ApiError(400, "Authorization code is missing");
 
-    const userInfo = await getGitHubUser(code);
-    if (!userInfo)
-      throw new ApiError(400, "Failed to fetch user info from Google");
+    if (state == "auth") {
+      const userInfo = await getGitHubUser(code);
+      if (!userInfo)
+        throw new ApiError(400, "Failed to fetch user info from Google");
 
-    const refinedUser: OAuth = {
-      email: userInfo.email!,
-      name: userInfo.name!,
-      avatarUrl: userInfo.avatar_url!,
-      githubId: JSON.stringify(userInfo.id)!,
-    };
+      const refinedUser: OAuth = {
+        email: userInfo.email!,
+        name: userInfo.name!,
+        avatarUrl: userInfo.avatar_url!,
+        githubId: JSON.stringify(userInfo.id)!,
+      };
 
-    let user;
-    const existingUser = await getUserViaEmail(userInfo.email!);
-    if (existingUser) {
-      user = existingUser;
+      let user;
+      const existingUser = await getUserViaEmail(userInfo.email!);
+      if (existingUser) {
+        user = existingUser;
+      } else {
+        user = await createAccountViaOauth("google", refinedUser);
+      }
+      const accessToken = user.generateAccessToken();
+      const refreshToken = await user.generateRefreshToken();
+      await user.save();
+      res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        domain: "localhost",
+        maxAge: 15 * 60 * 1000,
+      });
+
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        domain: "localhost",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
+      res.redirect("http://localhost:5173");
     } else {
-      user = await createAccountViaOauth("google", refinedUser);
+      const googleApi = new GoogleConnectApi();
+      const tokens = await googleApi.getTokens(code);
+      console.log(tokens);
     }
-    const accessToken = user.generateAccessToken();
-    const refreshToken = await user.generateRefreshToken();
-    await user.save();
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "lax",
-      domain: "localhost",
-      maxAge: 15 * 60 * 1000,
-    });
-
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "lax",
-      domain: "localhost",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
-    res.redirect("http://localhost:5173");
   }
 );
 
@@ -148,3 +155,18 @@ export const getCurrentUser = asyncHandler(
     return res.json(new ApiResponse(200, details));
   }
 );
+
+export const GoogleServiceInt = asyncHandler((req: Request, res: Response) => {
+  const googleApi = new GoogleConnectApi();
+  const authUrl = googleApi.getAuthUrl();
+
+  if (!authUrl) {
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Failed to generate Google OAuth URL"));
+  }
+
+  res
+    .status(200)
+    .json(new ApiResponse(300, authUrl, "Redirect to Google OAuth"));
+});
