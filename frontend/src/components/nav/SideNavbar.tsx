@@ -3,6 +3,7 @@ import { useEffect, useState, type ElementType } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Logo from "./Logo";
 import { useAppSelector } from "@/store/hooks";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 interface CollapsedProps {
   collapsed: boolean;
@@ -80,50 +81,213 @@ const AddIcon = () => {
   );
 };
 
+const UpgradeIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M16 18a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2zm0 -12a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2zm-7 12a6 6 0 0 1 6 -6a6 6 0 0 1 -6 -6a6 6 0 0 1 -6 6a6 6 0 0 1 6 6z" />
+  </svg>
+);
+
+const PlugIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M9.785 6l8.215 8.215l-2.054 2.054a5.81 5.81 0 1 1 -8.215 -8.215l2.054 -2.054z" />
+    <path d="M4 20l3.5 -3.5" />
+    <path d="M15 4l-3.5 3.5" />
+    <path d="M20 9l-3.5 3.5" />
+  </svg>
+);
+
+const HelpIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+    <path d="M12 17l0 .01" />
+    <path d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4" />
+  </svg>
+);
+
+const LogoutIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2" />
+    <path d="M9 12h12l-3 -3" />
+    <path d="M18 15l3 -3" />
+  </svg>
+);
+
+const SettingsIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z" />
+    <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+  </svg>
+);
 const UserButtonPlaceholder: React.FC<CollapsedProps> = ({ collapsed }) => {
   const user = useAppSelector((state) => state.auth.authData);
+  const navigate = useNavigate();
+  const popOverContents: NavItemData[] = [
+    {
+      icon: UpgradeIcon,
+      name: "Upgrade plan",
+      href: "/settings/general",
+    },
+    {
+      icon: SettingsIcon,
+      name: "Settings",
+      href: "/settings/general",
+    },
+    {
+      icon: PlugIcon,
+      name: "Integrations",
+      href: "/settings/integrations",
+    },
+    {
+      icon: HelpIcon,
+      name: "Help",
+      href: "/help",
+    },
+    {
+      icon: LogoutIcon,
+      name: "Logout",
+      href: "/logout",
+    },
+  ];
 
   return (
-    <div
-      className={cn(
-        "flex items-center p-3 border-t transition-all duration-300 ease-in-out hover:bg-accent/50 cursor-pointer group",
-        collapsed ? "justify-center" : "justify-start"
-      )}
-    >
-      <div className="flex items-center gap-3 w-full overflow-hidden">
+    <Popover>
+      <PopoverTrigger asChild>
         <div
           className={cn(
-            "flex-shrink-0 size-10 rounded-full bg-muted overflow-hidden ring-2 ring-transparent transition-all duration-300 group-hover:ring-orange-500/20",
-            collapsed && "mx-auto"
+            "flex items-center p-3 border-t transition-all duration-300 ease-in-out hover:bg-accent/50 cursor-pointer group",
+            collapsed ? "justify-center" : "justify-start"
           )}
         >
-          <img
-            src={user?.avatarUrl}
-            alt={user?.name}
-            className="size-10 rounded-full object-cover transition-transform duration-300 group-hover:scale-110"
-          />
-        </div>
+          <div className="flex items-center gap-3 w-full overflow-hidden">
+            <div
+              className={cn(
+                "flex-shrink-0 size-10 rounded-full bg-muted overflow-hidden ring-2 ring-transparent transition-all duration-300 group-hover:ring-primary/20",
+                collapsed && "mx-auto"
+              )}
+            >
+              <img
+                src={user?.avatarUrl}
+                alt={user?.name}
+                className="size-10 rounded-full object-cover transition-transform duration-300 group-hover:scale-110"
+              />
+            </div>
 
-        <div
-          className={cn(
-            "flex flex-col min-w-0 transition-all duration-300 ease-in-out",
-            collapsed
-              ? "w-0 opacity-0 translate-x-4"
-              : "w-full opacity-100 translate-x-0"
-          )}
-        >
-          <p className="text-sm font-medium text-foreground truncate transition-colors duration-200">
-            {user?.name}
-          </p>
-          <p className="text-xs text-muted-foreground truncate transition-colors duration-200">
-            {user?.email.toString()}
-          </p>
+            <div
+              className={cn(
+                "flex flex-col min-w-0 transition-all duration-300 ease-in-out",
+                collapsed
+                  ? "w-0 opacity-0 translate-x-4"
+                  : "w-full opacity-100 translate-x-0"
+              )}
+            >
+              <p className="text-sm font-medium text-foreground truncate transition-colors duration-200">
+                {user?.name}
+              </p>
+              <p className="text-xs text-muted-foreground truncate transition-colors duration-200">
+                {user?.email.toString()}
+              </p>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      </PopoverTrigger>
+
+      <PopoverContent
+        className="w-64 p-2 "
+        align="end"
+        side="top"
+        sideOffset={8}
+      >
+        <div className="space-y-1">
+          {/* User Info Header */}
+          <div className="px-3 py-2 mb-2">
+            <p className="text-sm font-medium text-foreground">{user?.name}</p>
+            <p className="text-xs text-muted-foreground truncate">
+              {user?.email}
+            </p>
+          </div>
+
+          <div className="border-t my-2" />
+
+          {popOverContents.map((item, index) => {
+            const Icon = item.icon;
+            const isLogout = item.name.toLowerCase() === "logout";
+
+            return (
+              <div
+                key={index}
+                onClick={() => navigate(item.href)}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
+                  isLogout
+                    ? "text-red-400 hover:bg-destructive/10"
+                    : "text-foreground hover:bg-accent"
+                )}
+              >
+                <Icon className="size-4 flex-shrink-0" />
+                <span className="capitalize">{item.name}</span>
+              </div>
+            );
+          })}
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 };
-
 const navItems: NavItemData[] = [
   {
     name: "New Task",
@@ -197,7 +361,6 @@ export default function Sidebar() {
         collapsed ? "w-16" : "w-64"
       )}
     >
-      {/* Header */}
       <div className="flex items-center justify-between px-4 py-2">
         <div
           className={cn(
@@ -220,7 +383,6 @@ export default function Sidebar() {
         </button>
       </div>
 
-      {/* Content Area */}
       <div className="flex-1 p-2 scrollbar-thin">
         <nav className="space-y-1">
           {navItems.map((item) => {

@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { addConnectionDef } from "../controllers/connection";
+import { addConnectionDef, getAllServices } from "../controllers";
+import { isAuthenticated } from "../middleware";
 
-const router=Router()
+const router = Router();
 
-router.post("/dev/add-connections-def",addConnectionDef)
-
-export {router as connectionRouter} 
+router.post("/dev/add-connections-def", addConnectionDef);
+router.get("/get-all-connetions",isAuthenticated, getAllServices);
+export { router as connectionRouter };
