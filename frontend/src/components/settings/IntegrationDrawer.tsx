@@ -9,10 +9,16 @@ import {
 import Logo from "../nav/Logo";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { useMemo, useState } from "react";
+import { axiosInstance } from "@/utils";
+import { Loader2 } from "lucide-react";
 
 export default function IntegrationDrawer({ open, drawerState, onClose }) {
+  const [isConnecting, setIsConnecting] = useState(false);
+
   if (!drawerState) return null;
+
   console.log(drawerState);
   const beamColor = useMemo(
     () => (drawerState.isConnected ? "34,197,94" : "239,68,68"),
@@ -20,7 +26,7 @@ export default function IntegrationDrawer({ open, drawerState, onClose }) {
   );
 
   const [selectedScopes, setSelectedScopes] = useState(
-    drawerState.connectedScopes?.map((s) => s._id)
+    drawerState.connectedScopes?.map((s) => s._id) || []
   );
 
   const toggleScope = (id) => {
@@ -35,6 +41,45 @@ export default function IntegrationDrawer({ open, drawerState, onClose }) {
       setSelectedScopes([]);
     } else {
       setSelectedScopes(drawerState.scopes.map((s) => s._id));
+    }
+  };
+
+  const handleConnection = async () => {
+    if (selectedScopes.length === 0) {
+      toast.success("Please select at least one permission to continue.");
+      return;
+    }
+
+    setIsConnecting(true);
+    try {
+      console.log(
+        selectedScopes,
+        "...................................................................................."
+      );
+
+      const sData = {
+        scopes: selectedScopes,
+        service: drawerState.service,
+      };
+
+      const { data } = await axiosInstance.post(
+        "/connection/google-service-init",
+        sData
+      );
+
+      if (data?.data) {
+        window.location = data.data;
+      } else {
+        throw new Error("Invalid response from server");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to initiate connection. Please try again."
+      );
+      setIsConnecting(false);
     }
   };
 
@@ -125,7 +170,8 @@ export default function IntegrationDrawer({ open, drawerState, onClose }) {
             <h3 className="text-base font-semibold">Permissions Requested</h3>
             <button
               onClick={selectAll}
-              className="text-sm text-primary hover:underline cursor-pointer"
+              disabled={isConnecting}
+              className="text-sm text-primary hover:underline cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {selectedScopes.length === drawerState.scopes.length
                 ? "Unselect All"
@@ -140,16 +186,17 @@ export default function IntegrationDrawer({ open, drawerState, onClose }) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.09 }}
-                onClick={() => toggleScope(scope._id)}
-                className={`p-4 rounded-xl border cursor-pointer  flex items-start gap-3 ${
+                onClick={() => !isConnecting && toggleScope(scope._id)}
+                className={`p-4 rounded-xl border cursor-pointer flex items-start gap-3 ${
                   selectedScopes.includes(scope._id)
                     ? "bg-accent border-primary"
                     : "bg-background hover:bg-accent/50"
-                }`}
+                } ${isConnecting ? "opacity-50 cursor-not-allowed" : ""}`}
               >
                 <Checkbox
                   checked={selectedScopes.includes(scope._id)}
                   onCheckedChange={() => toggleScope(scope._id)}
+                  disabled={isConnecting}
                   className="mt-1"
                 />
                 <div>
@@ -166,13 +213,22 @@ export default function IntegrationDrawer({ open, drawerState, onClose }) {
         <DrawerFooter className="border-t px-6 py-4">
           <Button
             className="w-full font-medium"
-            onClick={() => console.log("Connecting with", selectedScopes)}
+            onClick={handleConnection}
+            disabled={isConnecting}
           >
-            Connect {drawerState.displayName}
+            {isConnecting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Connecting...
+              </>
+            ) : (
+              `Connect ${drawerState.displayName}`
+            )}
           </Button>
           <button
             onClick={onClose}
-            className="text-sm text-muted-foreground hover:text-foreground hover:underline mt-2"
+            disabled={isConnecting}
+            className="text-sm text-muted-foreground hover:text-foreground hover:underline mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Cancel
           </button>

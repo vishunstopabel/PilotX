@@ -103,6 +103,7 @@ export const addConnectionDef = asyncHandler(
 export const GoogleServiceInt = asyncHandler(
   async (req: Request, res: Response) => {
     const { scopes, service } = req.body;
+    console.log(scopes)
     const scopeIds = scopes.map((s: string) => new mongoose.Types.ObjectId(s));
     const connectionDef = await ConnectionDefinition.aggregate([
       { $match: { service } },
