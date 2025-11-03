@@ -1,9 +1,11 @@
 import { Document, Types } from "mongoose";
 
-export interface IScope  {
+export interface IScope {
   name: string;
-  description: string; 
-
+  description: string;
+}
+interface IScopeWithId extends IScope {
+  _id: string;
 }
 
 export interface IConnectionDef extends Document {
@@ -29,5 +31,5 @@ export interface IServiceConnection extends Document {
   status: "connected" | "disconnected";
   createdAt?: Date;
   updatedAt?: Date;
-  connectedScops: [];
+  connectedScops: string[];
 }

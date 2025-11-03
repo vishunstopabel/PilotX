@@ -19,7 +19,7 @@ const ServiceConnectionSchema = new Schema<IServiceConnection>(
 
     refreshToken: { type: String },
 
-    expiresAt: { type: Date },
+    expiresAt: { type: Date ,required:false},
 
     status: {
       type: String,

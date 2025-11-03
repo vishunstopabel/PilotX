@@ -10,9 +10,7 @@ interface IScope {
   description: string;
   _id: string;
 }
-const connectToService = asyncHandler(
-  async (req: Request, res: Response) => {}
-);
+
 
 export const getAllServices = asyncHandler(
   async (req: Request, res: Response) => {
@@ -103,7 +101,9 @@ export const addConnectionDef = asyncHandler(
 export const GoogleServiceInt = asyncHandler(
   async (req: Request, res: Response) => {
     const { scopes, service } = req.body;
-    console.log(scopes)
+    console.log(scopes);
+
+    //TODO:Enhance
     const scopeIds = scopes.map((s: string) => new mongoose.Types.ObjectId(s));
     const connectionDef = await ConnectionDefinition.aggregate([
       { $match: { service } },
