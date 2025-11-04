@@ -11,7 +11,6 @@ interface IScope {
   _id: string;
 }
 
-
 export const getAllServices = asyncHandler(
   async (req: Request, res: Response) => {
     const { userId } = req.user;
@@ -19,7 +18,7 @@ export const getAllServices = asyncHandler(
     const userConnections = await ServiceConnection.find({ userId })
       .select("status scopes connectionDefId userId")
       .populate("connectionDefId");
-
+    console.log(userConnections);
     const allAvailableConnections = await ConnectionDefinition.find({
       isEnabled: true,
     }).lean();
@@ -29,6 +28,7 @@ export const getAllServices = asyncHandler(
         const userConn = userConnections.find(
           (sc: IServiceConnection) => sc.connectionDefId._id === def._id
         );
+          console.log(userConn)
 
         if (userConn) {
           return {
