@@ -16,20 +16,23 @@ export const getAllServices = asyncHandler(
     const { userId } = req.user;
 
     const userConnections = await ServiceConnection.find({ userId })
-      .select("status scopes connectionDefId userId")
+      .select("status scopes connectionDefId userId connectedScops")
       .populate("connectionDefId");
-    console.log(userConnections);
+    console.log(userConnections, "user connections ");
+
     const allAvailableConnections = await ConnectionDefinition.find({
       isEnabled: true,
     }).lean();
-
+    console.log(allAvailableConnections);
     const finalConnections = allAvailableConnections.map(
       (def: IConnectionDef) => {
-        const userConn = userConnections.find(
-          (sc: IServiceConnection) => sc.connectionDefId._id === def._id
-        );
-          console.log(userConn)
-
+        const userConn = userConnections.find((sc: IServiceConnection) => {
+          const match =
+            sc.connectionDefId._id?.toString() === def._id?.toString();
+          console.log(match, `${sc.connectionDefId._id}===${def._id}`);
+          return match;
+        });
+        console.log(userConn);
         if (userConn) {
           return {
             ...def,
@@ -37,14 +40,14 @@ export const getAllServices = asyncHandler(
             status: userConn.status,
             connectedScopes: userConn.connectedScops || [],
           };
-        } else {
-          return {
-            ...def,
-            isConnected: false,
-            status: "disconnected",
-            connectedScopes: [],
-          };
         }
+
+        return {
+          ...def,
+          isConnected: false,
+          status: "disconnected",
+          connectedScopes: [],
+        };
       }
     );
 

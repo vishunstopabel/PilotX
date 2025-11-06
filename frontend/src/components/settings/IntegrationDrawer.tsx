@@ -26,8 +26,9 @@ export default function IntegrationDrawer({ open, drawerState, onClose }) {
   );
 
   const [selectedScopes, setSelectedScopes] = useState(
-    drawerState.connectedScopes?.map((s) => s._id) || []
+    drawerState.connectedScopes?.map((s) => s) || []
   );
+  console.log(selectedScopes)
 
   const toggleScope = (id) => {
     console.log(selectedScopes);
